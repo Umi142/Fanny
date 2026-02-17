@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:3000'
+      '/api': 'https://cuddly-goldfish-q7x7pw7j5xw6247j-3000.app.github.dev'
     }
   }
 })
