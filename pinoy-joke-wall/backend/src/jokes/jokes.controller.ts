@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
+import { SupabaseService } from '../supabase.service';
 
 @Controller('jokes')
 export class JokesController {
+  constructor(private readonly supabase: SupabaseService) {}
+
   @Get()
-  getJokes() {
-    return [
-      { id: 1, content: 'Knock knock!', likes: 5 },
-      { id: 2, content: 'Sana all!', likes: 10 }
-    ];
+  async getJokes() {
+    return this.supabase.getJokes();
   }
 }
