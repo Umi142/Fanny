@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './GuestbookPage.css'; 
+import './GuestbookPage.css';
 
 interface Joke {
   id: string;
@@ -12,52 +12,67 @@ interface Joke {
 export default function GuestbookPage() {
   const [jokes, setJokes] = useState<Joke[]>([]);
   const [newJoke, setNewJoke] = useState('');
+  const [gumballJoke, setGumballJoke] = useState<{ content: string } | null>(null);
 
-  // Fetch jokes from backend
+  const loadJokes = async () => {
+    try {
+      const res = await fetch('/api/jokes');
+      if (!res.ok) throw new Error(`Failed to fetch jokes: ${res.status}`);
+      const data = await res.json();
+      setJokes(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    fetch('/api/jokes')
-      .then(res => res.json())
-      .then(data => setJokes(data));
+    loadJokes();
   }, []);
 
-  // Submit new joke
   const handleSubmit = async () => {
     if (!newJoke.trim()) return;
 
     const audio = new Audio('/sounds/submit.mp3');
     audio.play();
 
-    await fetch('/api/jokes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: newJoke, author_name: 'Anonymous' })
-    });
-
-    setNewJoke('');
-    const res = await fetch('/api/jokes');
-    setJokes(await res.json());
+    try {
+      await fetch('/api/jokes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newJoke, author_name: 'Anonymous' })
+      });
+      setNewJoke('');
+      await loadJokes();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // Like a joke
   const handleLike = async (jokeId: string) => {
-    await fetch('/api/jokes/like', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jokeId })
-    });
-
-    const res = await fetch('/api/jokes');
-    setJokes(await res.json());
+    try {
+      await fetch('/api/jokes/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jokeId })
+      });
+      await loadJokes();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // Gumball machine effect
   const handleGumball = async () => {
     const audio = new Audio('/sounds/gumball.mp3');
     audio.play();
 
-    const res = await fetch('/api/pinoy_jokes/random');
-    const randomJoke = await res.json();
-    alert(`🎱 Gumball Joke: ${randomJoke.content}`);
+    try {
+      const res = await fetch('/api/pinoy_jokes/random');
+      if (!res.ok) throw new Error(`Failed to fetch gumball joke: ${res.status}`);
+      const randomJoke = await res.json();
+      setGumballJoke(randomJoke);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -77,20 +92,33 @@ export default function GuestbookPage() {
       </section>
 
       <section className="jokes-section">
-        {jokes.map(j => (
-          <div className="joke-card fade-in" key={j.id}>
-            <p>{j.content}</p>
-            <p><strong>{j.author_name}</strong></p>
-            <button onClick={() => handleLike(j.id)}>🔥 {j.likes}</button>
-            <small>{new Date(j.created_at).toLocaleString()}</small>
-          </div>
-        ))}
+        <h2>Latest Jokes</h2>
+        {jokes.length === 0 ? (
+          <p className="empty">No jokes yet. Be the first!</p>
+        ) : (
+          jokes.map(j => (
+            <div className="joke-card fade-in" key={j.id}>
+              <p className="joke-content">{j.content}</p>
+              <p className="joke-author">— {j.author_name}</p>
+              <button className="like-btn" onClick={() => handleLike(j.id)}>
+                🔥 {j.likes}
+              </button>
+              <small>{new Date(j.created_at).toLocaleString()}</small>
+            </div>
+          ))
+        )}
       </section>
 
       <section className="gumball-section">
         <button className="gumball-btn" onClick={handleGumball}>
           🎱 Turn the Gumball Machine
         </button>
+        {gumballJoke && (
+          <div className="joke-card bounce-in">
+            <p className="joke-content">{gumballJoke.content}</p>
+            <p className="joke-author">— Pinoy Joke</p>
+          </div>
+        )}
       </section>
 
       <footer>
