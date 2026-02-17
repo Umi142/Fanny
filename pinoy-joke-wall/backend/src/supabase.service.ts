@@ -20,4 +20,29 @@ export class SupabaseService {
     if (error) throw error;
     return data;
   }
+
+  async addJoke(content: string, author_name: string) {
+    const { data, error } = await this.supabase
+      .from('jokes')
+      .insert([{ content, author_name }])
+      .select();
+    if (error) throw error;
+    return data;
+  }
+
+  async likeJoke(jokeId: string) {
+    const { error } = await this.supabase.rpc('increment_likes', { joke_id: jokeId });
+    if (error) throw error;
+    return { success: true };
+  }
+
+  async getRandomPinoyJoke() {
+    const { data, error } = await this.supabase
+      .from('pinoy_jokes')
+      .select('*')
+      .order('random()')
+      .limit(1);
+    if (error) throw error;
+    return data[0];
+  }
 }

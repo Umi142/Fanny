@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+// Define Joke type
 interface Joke {
   id: string;
   content: string;
@@ -10,23 +11,92 @@ interface Joke {
 
 export default function GuestbookPage() {
   const [jokes, setJokes] = useState<Joke[]>([]);
+  const [newJoke, setNewJoke] = useState('');
 
+  // Fetch jokes from backend
   useEffect(() => {
     fetch('/api/jokes')
       .then(res => res.json())
       .then(data => setJokes(data));
   }, []);
 
+  // Submit new joke
+  const handleSubmit = async () => {
+    if (!newJoke.trim()) return;
+
+    // Play sound effect when submitting
+    const audio = new Audio('/sounds/submit.mp3');
+    audio.play();
+
+    await fetch('/api/jokes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: newJoke, author_name: 'Anonymous' })
+    });
+
+    setNewJoke('');
+    // Refresh jokes
+    const res = await fetch('/api/jokes');
+    setJokes(await res.json());
+  };
+
+  // Like a joke
+  const handleLike = async (jokeId: string) => {
+    await fetch('/api/jokes/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jokeId })
+    });
+
+    // Refresh jokes
+    const res = await fetch('/api/jokes');
+    setJokes(await res.json());
+  };
+
+  // Gumball machine effect
+  const handleGumball = async () => {
+    const audio = new Audio('/sounds/gumball.mp3');
+    audio.play();
+
+    const res = await fetch('/api/pinoy_jokes/random');
+    const randomJoke = await res.json();
+    alert(`🎱 Gumball Joke: ${randomJoke.content}`);
+  };
+
   return (
-    <div style={{ padding: '1rem' }}>
-      <h1>Pinoy Joke Wall</h1>
-      {jokes.map(j => (
-        <div key={j.id} style={{ marginBottom: '1rem', borderBottom: '1px solid #ccc' }}>
-          <p><strong>{j.author_name}</strong>: {j.content}</p>
-          <p>🔥 {j.likes} likes</p>
-          <small>{new Date(j.created_at).toLocaleString()}</small>
-        </div>
-      ))}
+    <div className="container">
+      <header>
+        <h1>Pinoy Joke Wall</h1>
+      </header>
+
+      <section className="form-section">
+        <input
+          type="text"
+          placeholder="Share your joke..."
+          value={newJoke}
+          onChange={(e) => setNewJoke(e.target.value)}
+        />
+        <button onClick={handleSubmit}>Submit</button>
+      </section>
+
+      <section className="jokes-section">
+        {jokes.map(j => (
+          <div className="joke-card" key={j.id}>
+            <p>{j.content}</p>
+            <p><strong>{j.author_name}</strong></p>
+            <button onClick={() => handleLike(j.id)}>🔥 {j.likes}</button>
+            <small>{new Date(j.created_at).toLocaleString()}</small>
+          </div>
+        ))}
+      </section>
+
+      <section className="gumball-section">
+        <button onClick={handleGumball}>🎱 Turn the Gumball Machine</button>
+      </section>
+
+      <footer>
+        <small>HAKDOG</small>
+      </footer>
     </div>
   );
 }
