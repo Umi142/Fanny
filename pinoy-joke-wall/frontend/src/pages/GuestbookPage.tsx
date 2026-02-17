@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import './GuestbookPage.css'; 
 
-// Define Joke type
 interface Joke {
   id: string;
   content: string;
@@ -24,7 +24,6 @@ export default function GuestbookPage() {
   const handleSubmit = async () => {
     if (!newJoke.trim()) return;
 
-    // Play sound effect when submitting
     const audio = new Audio('/sounds/submit.mp3');
     audio.play();
 
@@ -35,7 +34,6 @@ export default function GuestbookPage() {
     });
 
     setNewJoke('');
-    // Refresh jokes
     const res = await fetch('/api/jokes');
     setJokes(await res.json());
   };
@@ -48,7 +46,6 @@ export default function GuestbookPage() {
       body: JSON.stringify({ jokeId })
     });
 
-    // Refresh jokes
     const res = await fetch('/api/jokes');
     setJokes(await res.json());
   };
@@ -81,7 +78,7 @@ export default function GuestbookPage() {
 
       <section className="jokes-section">
         {jokes.map(j => (
-          <div className="joke-card" key={j.id}>
+          <div className="joke-card fade-in" key={j.id}>
             <p>{j.content}</p>
             <p><strong>{j.author_name}</strong></p>
             <button onClick={() => handleLike(j.id)}>🔥 {j.likes}</button>
@@ -91,11 +88,13 @@ export default function GuestbookPage() {
       </section>
 
       <section className="gumball-section">
-        <button onClick={handleGumball}>🎱 Turn the Gumball Machine</button>
+        <button className="gumball-btn" onClick={handleGumball}>
+          🎱 Turn the Gumball Machine
+        </button>
       </section>
 
       <footer>
-        <small>HAKDOG</small>
+        <small>Made with ❤️ in Codespaces</small>
       </footer>
     </div>
   );

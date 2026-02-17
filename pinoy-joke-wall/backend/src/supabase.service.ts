@@ -16,7 +16,6 @@ export class SupabaseService {
       .from('jokes')
       .select('*')
       .order('created_at', { ascending: false });
-
     if (error) throw error;
     return data;
   }
@@ -36,13 +35,9 @@ export class SupabaseService {
     return { success: true };
   }
 
-  async getRandomPinoyJoke() {
-    const { data, error } = await this.supabase
-      .from('pinoy_jokes')
-      .select('*')
-      .order('random()')
-      .limit(1);
-    if (error) throw error;
-    return data[0];
-  }
+async getRandomPinoyJoke() {
+  const { data, error } = await this.supabase.rpc('random_pinoy_joke');
+  if (error) throw error;
+  return data && data[0] ? data[0] : { content: 'No Pinoy jokes found!' };
+}
 }

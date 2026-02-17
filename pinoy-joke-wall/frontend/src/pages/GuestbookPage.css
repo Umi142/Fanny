@@ -1,0 +1,74 @@
+.container {
+  max-width: 600px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-section {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-section input {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.form-section button {
+  padding: 0.5rem 1rem;
+  background: #ff9800;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.joke-card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: #222;
+}
+
+.joke-card button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #ff9800;
+}
+
+/* Fade-in animation for jokes */
+.fade-in {
+  animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gumball-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.gumball-btn {
+  padding: 0.5rem 1rem;
+  background: #673ab7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.gumball-btn:hover {
+  transform: rotate(-5deg) scale(1.05);
+}
