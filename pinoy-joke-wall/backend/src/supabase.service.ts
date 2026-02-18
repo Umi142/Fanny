@@ -20,11 +20,17 @@ export class SupabaseService {
     return data;
   }
 
-  async addJoke(content: string, author_name: string) {
+  // UPDATED: Added avatar_url parameter
+  async addJoke(content: string, author_name: string, avatar_url: string) {
     const { data, error } = await this.supabase
       .from('jokes')
-      .insert([{ content, author_name }])
+      .insert([{ 
+        content, 
+        author_name, 
+        avatar_url // This saves the meme path to SQL column
+      }])
       .select();
+    
     if (error) throw error;
     return data;
   }
@@ -35,9 +41,9 @@ export class SupabaseService {
     return { success: true };
   }
 
-async getRandomPinoyJoke() {
-  const { data, error } = await this.supabase.rpc('random_pinoy_joke');
-  if (error) throw error;
-  return data && data[0] ? data[0] : { content: 'No Pinoy jokes found!' };
-}
+  async getRandomPinoyJoke() {
+    const { data, error } = await this.supabase.rpc('random_pinoy_joke');
+    if (error) throw error;
+    return data && data[0] ? data[0] : { content: 'No Pinoy jokes found!' };
+  }
 }
