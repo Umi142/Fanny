@@ -12,6 +12,7 @@ export class SupabaseService {
     const { data, error } = await this.supabase
       .from('jokes')
       .select('*')
+      .eq('is_archived', false) // This filters out the archived jokes that was made during testing
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data;
