@@ -6,19 +6,23 @@ import express from 'express';
 
 let cachedServer: any;
 
-export const handler = async (event: any, context: any, callback: any) => {
-  if (!cachedServer) {
-    const expressApp = express();
-    const nestApp = await NestFactory.create(
-      AppModule,
-      new ExpressAdapter(expressApp),
-    );
-    
-    nestApp.enableCors();
-    await nestApp.init();
-    
-    cachedServer = serverlessExpress({ app: expressApp });
-  }
+async function bootstrap() {
+  const expressApp = express();
+  const nestApp = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+  );
   
-  return cachedServer(event, context, callback);
+  nestApp.enableCors();
+  await nestApp.init();
+  
+  return serverlessExpress({ app: expressApp });
+}
+
+// VERCEL FIX: Use export default for the handler
+export default async (req: any, res: any) => {
+  if (!cachedServer) {
+    cachedServer = await bootstrap();
+  }
+  return cachedServer(req, res);
 };
