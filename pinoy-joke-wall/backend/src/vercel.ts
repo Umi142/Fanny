@@ -1,28 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import serverlessExpress from '@vendia/serverless-express';
 import express from 'express';
 
+// This will cache the server so it doesn't have to restart on every click
 let cachedServer: any;
 
-async function bootstrap() {
-  const expressApp = express();
-  const nestApp = await NestFactory.create(
-    AppModule,
-    new ExpressAdapter(expressApp),
-  );
-  
-  nestApp.enableCors();
-  await nestApp.init();
-  
-  return serverlessExpress({ app: expressApp });
-}
-
-// VERCEL FIX: Use export default for the handler
 export default async (req: any, res: any) => {
   if (!cachedServer) {
-    cachedServer = await bootstrap();
+    const expressApp = express();
+    const nestApp = await NestFactory.create(
+      AppModule,
+      new ExpressAdapter(expressApp),
+    );
+    
+    // VERY IMPORTANT: This matches frontend calls like fetch('/api/jokes')
+    nestApp.setGlobalPrefix('api'); 
+    
+    nestApp.enableCors();
+    await nestApp.init();
+    
+    cachedServer = expressApp;
   }
+  
+  // Directly pass the request to the Express instance
   return cachedServer(req, res);
 };
