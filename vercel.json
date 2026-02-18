@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "pinoy-joke-wall/backend/src/vercel.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["pinoy-joke-wall/backend/src/**"]
+      }
+    },
+    {
+      "src": "pinoy-joke-wall/frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "pinoy-joke-wall/backend/src/vercel.ts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "pinoy-joke-wall/frontend/$1"
+    }
+  ]
+}
