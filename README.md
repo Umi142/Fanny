@@ -4,7 +4,7 @@ A full-stack, interactive platform for sharing Filipino humor. Users can post jo
 ---
 
 ## 🌐 Live Links
-- **Frontend UI:** [https://fanny-psi.vercel.app/](https://fanny-psi.vercel.app/)
+- **Frontend UI:** [https://fanny-psi.vercel.app/](https://fanny-psi.vercel.app/)(https://fanny-psi.vercel.app?_vercel_share=dSKdIo4NeCY5hXcDosETNEJWagDF5HKX)
 
 ---
 
